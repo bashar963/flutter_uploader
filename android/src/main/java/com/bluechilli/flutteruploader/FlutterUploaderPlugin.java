@@ -15,7 +15,6 @@ import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.MethodChannel;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -42,16 +41,6 @@ public class FlutterUploaderPlugin implements FlutterPlugin, StatusListener {
   private final CachingStreamHandler<Map<String, Object>> resultStreamHandler =
       new CachingStreamHandler<>();
   private LiveData<List<WorkInfo>> workInfoLiveData;
-
-  public static void registerWith(Registrar registrar) {
-    final FlutterUploaderPlugin plugin = new FlutterUploaderPlugin();
-    plugin.startListening(registrar.context(), registrar.messenger());
-    registrar.addViewDestroyListener(
-        view -> {
-          plugin.stopListening();
-          return false;
-        });
-  }
 
   @Override
   public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
@@ -84,10 +73,12 @@ public class FlutterUploaderPlugin implements FlutterPlugin, StatusListener {
   }
 
   private void stopListening() {
-    channel.setMethodCallHandler(null);
-    channel = null;
+    if (channel != null) {
+      channel.setMethodCallHandler(null);
+      channel = null;
+    }
 
-    if (uploadObserver != null) {
+    if (uploadObserver != null && workInfoLiveData != null) {
       workInfoLiveData.removeObserver(uploadObserver);
       workInfoLiveData = null;
       uploadObserver = null;
@@ -95,11 +86,15 @@ public class FlutterUploaderPlugin implements FlutterPlugin, StatusListener {
 
     methodCallHandler = null;
 
-    progressEventChannel.setStreamHandler(null);
-    progressEventChannel = null;
+    if (progressEventChannel != null) {
+      progressEventChannel.setStreamHandler(null);
+      progressEventChannel = null;
+    }
 
-    resultEventChannel.setStreamHandler(null);
-    resultEventChannel = null;
+    if (resultEventChannel != null) {
+      resultEventChannel.setStreamHandler(null);
+      resultEventChannel = null;
+    }
 
     progressStreamHandler.clear();
     resultStreamHandler.clear();
@@ -110,7 +105,6 @@ public class FlutterUploaderPlugin implements FlutterPlugin, StatusListener {
     Map<String, Object> args = new HashMap<>();
     args.put("taskId", id);
     args.put("status", UploadStatus.ENQUEUED);
-
     resultStreamHandler.add(id, args);
   }
 
@@ -120,7 +114,6 @@ public class FlutterUploaderPlugin implements FlutterPlugin, StatusListener {
     args.put("taskId", id);
     args.put("status", status);
     args.put("progress", progress);
-
     progressStreamHandler.add(id, args);
   }
 
@@ -143,7 +136,6 @@ public class FlutterUploaderPlugin implements FlutterPlugin, StatusListener {
         details != null
             ? new ArrayList<>(Arrays.asList(details))
             : Collections.<String>emptyList());
-
     resultStreamHandler.add(id, args);
   }
 
@@ -160,7 +152,6 @@ public class FlutterUploaderPlugin implements FlutterPlugin, StatusListener {
     args.put("statusCode", statusCode);
     args.put("message", response);
     args.put("headers", headers != null ? headers : Collections.<String, Object>emptyMap());
-
     resultStreamHandler.add(id, args);
   }
 
