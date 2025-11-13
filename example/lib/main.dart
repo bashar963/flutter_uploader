@@ -1,11 +1,11 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_uploader/flutter_uploader.dart';
 import 'package:flutter_uploader_example/responses_screen.dart';
 import 'package:flutter_uploader_example/upload_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 const String title = 'FileUpload Sample app';
 final Uri uploadURL = Uri.parse(
@@ -142,8 +142,6 @@ class _AppState extends State<App> {
       requestSoundPermission: false,
       requestBadgePermission: false,
       requestAlertPermission: true,
-      onDidReceiveLocalNotification:
-          (int id, String? title, String? body, String? payload) async {},
     );
     var initializationSettings = InitializationSettings(
       android: initializationSettingsAndroid,
