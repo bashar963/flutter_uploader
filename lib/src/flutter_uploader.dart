@@ -1,4 +1,4 @@
-part of flutter_uploader;
+part of '../flutter_uploader.dart';
 
 /// Controls task scheduling and allows developers to observe the status.
 /// The class is designed as a singleton and can therefore be instantiated as

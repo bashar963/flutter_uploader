@@ -33,10 +33,10 @@ void backgroundHandler() {
         }
 
         notifications.show(
-          progress.taskId.hashCode,
-          'FlutterUploader Example',
-          'Upload in Progress',
-          NotificationDetails(
+          id: progress.taskId.hashCode,
+          title: 'FlutterUploader Example',
+          body: 'Upload in Progress',
+          notificationDetails: NotificationDetails(
             android: AndroidNotificationDetails(
               'FlutterUploader.Example',
               'FlutterUploader',
@@ -65,7 +65,7 @@ void backgroundHandler() {
       processed.add(result.taskId);
       preferences.setStringList('processed', processed);
 
-      notifications.cancel(result.taskId.hashCode);
+      notifications.cancel(id: result.taskId.hashCode);
 
       final successful = result.status == UploadTaskStatus.complete;
 
@@ -78,10 +78,10 @@ void backgroundHandler() {
 
       notifications
           .show(
-        result.taskId.hashCode,
-        'FlutterUploader Example',
-        title,
-        NotificationDetails(
+        id: result.taskId.hashCode,
+        title: 'FlutterUploader Example',
+        body: title,
+        notificationDetails: NotificationDetails(
           android: AndroidNotificationDetails(
             'FlutterUploader.Example',
             'FlutterUploader',
@@ -148,7 +148,7 @@ class _AppState extends State<App> {
       iOS: initializationSettingsIOS,
     );
     flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
+      settings: initializationSettings,
     );
 
     SharedPreferences.getInstance()
